@@ -1,4 +1,4 @@
-package server_tcp;
+package archive.ClientServerTCP;
 
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;

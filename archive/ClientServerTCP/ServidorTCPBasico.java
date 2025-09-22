@@ -1,4 +1,4 @@
-package ClientServerTCP;
+package archive.ClientServerTCP;
 
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
