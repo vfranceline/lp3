@@ -1,4 +1,4 @@
-package threads;
+package archive.threads;
 
 public class MyRunnable implements Runnable
 {

@@ -1,4 +1,4 @@
-package calculadoraUDP;
+package estudando_de_vdd.calculadoraUDP;
 
 import java.sql.Struct;
 
