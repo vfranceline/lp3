@@ -1,4 +1,4 @@
-package estudando_de_vdd.TCP;
+package TCP;
 
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
