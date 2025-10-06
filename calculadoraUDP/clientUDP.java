@@ -1,4 +1,4 @@
-package estudando_de_vdd.calculadoraUDP;
+package calculadoraUDP;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

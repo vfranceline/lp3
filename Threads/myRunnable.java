@@ -1,4 +1,4 @@
-package estudando_de_vdd.Threads;
+package Threads;
 
 public class myRunnable implements Runnable{
     static int count = 0;

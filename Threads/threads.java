@@ -1,4 +1,4 @@
-package estudando_de_vdd.Threads;
+package Threads;
 
 public class threads {
     public static void main(String[] args) throws InterruptedException{

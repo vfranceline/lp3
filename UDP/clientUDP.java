@@ -1,4 +1,4 @@
-package estudando_de_vdd.UDP;
+package UDP;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

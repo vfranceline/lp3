@@ -1,4 +1,4 @@
-package estudando_de_vdd.Threads;
+package Threads;
 
 // Classe principal que demonstra o uso de sincronização em threads
 public class MySynchronized {

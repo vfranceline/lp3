@@ -1,4 +1,4 @@
-package estudando_de_vdd.UDP;
+package UDP;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
