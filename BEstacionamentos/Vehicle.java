@@ -1,18 +1,19 @@
 package BEstacionamentos;
 
 import java.util.Random;
-import java.util.concurrent.Semaphore;
 
 public class Vehicle implements Runnable{
 
-    protected final String tipo;
-    protected final int idVehicle;
+    private final String tipo;
+    private final int idVehicle;
     private final ParkingManager manager;
+    private boolean estacionou;
 
     public Vehicle(String tipo, int idVehicle, ParkingManager manager){
         this.tipo = tipo;
         this.idVehicle = idVehicle;
         this.manager = manager;
+        this.estacionou = false;
     }
 
     @Override
@@ -20,10 +21,16 @@ public class Vehicle implements Runnable{
         try {
             System.out.println("Veiculo #" + idVehicle + "(" + tipo + ") chegou ao portão de entrada");
             manager.getSemaphore_entrada().acquire();
+            estacionou = false;
+
             if (tipo.equalsIgnoreCase("PRIORITARIO")){
                 getVagaPrioridade();
             } else {
                 getVagaRegular();
+            }
+
+            if (estacionou){
+                manager.incrementaEntrada();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -56,6 +63,7 @@ public class Vehicle implements Runnable{
             if (manager.getSemaphore_vaga_regular().tryAcquire()){
                 manager.getSemaphore_entrada().release();
                 System.out.println("Veiculo #" + idVehicle + "(" + tipo + ") conseguiu vaga REGULAR");
+                this.estacionou = true;
                 Thread.sleep(randomTempo());
                 System.out.println("Veiculo #" + idVehicle + "(" + tipo + ") está estacionado por " + randomTempo() + "ms");
                 saidaRegular();
@@ -72,6 +80,7 @@ public class Vehicle implements Runnable{
             if (manager.getSemaphore_vaga_prioridade().tryAcquire()){
                 manager.getSemaphore_entrada().release();
                 System.out.println("Veiculo #" + idVehicle + "(" + tipo + ") conseguiu vaga PRIORIDADE");
+                this.estacionou = true;
                 Thread.sleep(randomTempo());
                 System.out.println("Veiculo #" + idVehicle + "(" + tipo + ") está estacionado por " + randomTempo() + "ms");
                 saidaPrioridade();
