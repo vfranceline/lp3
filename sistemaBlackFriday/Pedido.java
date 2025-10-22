@@ -1,5 +1,8 @@
 package sistemaBlackFriday;
 
+import java.time.*;
+import java.time.format.*;
+
 public class Pedido implements Comparable<Pedido>{
     public enum Prioridade{
         ALTA, MEDIA, BAIXA
@@ -30,6 +33,26 @@ public class Pedido implements Comparable<Pedido>{
         } else {
             return 1;
         }
+    }
+
+    @Override
+    public String toString() {
+        // Pega o long e converte para um objeto de tempo
+        Instant instant = Instant.ofEpochMilli(this.timestampCriacao);
+        
+        // Define o fuso horário (usei o de São Paulo como padrão) e o formato
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+                                                    .withZone(ZoneId.of("America/Sao_Paulo"));
+
+        // Formata o pedido
+        return String.format("Pedido#%d [%s] %s - %s x%d (%s)",
+                this.idPedido,
+                this.prioridade,
+                this.nomeCliente,
+                this.produto,
+                this.quantidade,
+                formatter.format(instant) // Formata o tempo
+        );
     }
 
     public int getIdPedido() {
