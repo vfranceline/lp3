@@ -1,0 +1,119 @@
+Este é um guia prático sobre "quando usar o quê" em concorrência e redes, baseado nos seus exercícios.
+
+---
+### PARTE 1: A BASE (REDE)
+---
+
+**Use TCP (Sockets)**
+* **Quando:** Você precisa de 100% de **confiabilidade**. A ordem e a entrega das mensagens são cruciais.
+* **O que é:** Uma "ligação telefônica".
+* **Exemplos de Problemas:**
+    * `Chat (lp3/chat/)`: Mensagens não podem se perder ou chegar fora de ordem.
+    * `Transferência de Arquivo (lp3/lista/ex2/)`: Perder um único byte corrompe o arquivo.
+    * `Leilão (Lista Ex 5)`: A sequência de lances é crítica.
+    * `Jogo de Batalha Naval (Lista Ex 7)`: A sequência de jogadas deve ser garantida.
+    * `Dicionário (Lista Ex 3)`: Você precisa garantir que a definição recebida corresponde à palavra enviada.
+
+**Use UDP (DatagramSocket)**
+* **Quando:** Você precisa de **velocidade** e pode tolerar a perda ocasional de pacotes.
+* **O que é:** Enviar um "cartão-postal". É rápido, mas não há garantia de entrega ou ordem.
+* **Exemplos de Problemas:**
+    * `Servidor de Eco/Calculadora (lp3/UDP/, lp3/calculadoraUDP/)`: Exemplos simples de envio.
+    * **Problema Novo:** Um jogo online de tiro (onde a posição do jogador é enviada 60x por segundo. Se um pacote se perder, não importa, o próximo chegará em 16ms).
+    * **Problema Novo:** Streaming de vídeo ou voz.
+
+---
+### PARTE 2: GERENCIAMENTO DE TAREFAS (COMO RODAR?)
+---
+
+**Use Executores (ExecutorService / Pool de Threads)**
+* **Quando:** SEMPRE que você precisar rodar tarefas concorrentes. É a forma moderna e eficiente de gerenciar threads.
+* **O que é:** Um "exército de trabalhadores" (threads) que são reutilizados. Evita o custo de `new Thread().start()` para cada tarefa.
+* **Tipos:**
+    * **`newFixedThreadPool(N)`:** Para um número fixo de tarefas que rodam em paralelo, geralmente para tarefas pesadas (que usam CPU).
+        * `lp3/sistemaBlackFriday/`: Processar N pedidos ao mesmo tempo.
+        * `lp3/BEstacionamentos/`: Simular N carros chegando ao mesmo tempo.
+        * `Lista Ex 10`: Processar N arquivos de texto em paralelo.
+    * **`newCachedThreadPool()`:** Para um número *variável* de tarefas curtas, principalmente que esperam por rede (I/O).
+        * `lp3/ApoloTech/`: Iniciar os módulos (tarefas curtas de "espera").
+        * `lp3/chat/`: Seria a *melhoria* ideal para o ChatServer, lidando com centenas de clientes que passam a maior parte do tempo "esperando" por mensagens.
+    * **`newSingleThreadExecutor()`:** Para garantir que tarefas rodem em *sequência* (uma após a outra), mas em uma thread *separada* da principal.
+        * `lp3/sistemaBlackFriday/`: Perfeito para o `Monitor`, que roda em segundo plano.
+        * **Problema Novo:** Um sistema de "Logger" que pega mensagens de várias threads e as escreve em um arquivo, uma de cada vez.
+
+---
+### PARTE 3: PROTEÇÃO DE DADOS (COMO PROTEGER?)
+---
+
+**Use Classes Atômicas (AtomicInteger, AtomicBoolean, AtomicReference)**
+* **Quando:** Você só precisa proteger *uma única variável* (um contador, uma flag, ou uma referência de objeto) contra "condições de corrida" (como `i++`).
+* **O que é:** A forma mais rápida e leve de garantir atomicidade para uma variável.
+* **Exemplos:**
+    * `AtomicInteger`: Para contadores.
+        * `lp3/sistemaBlackFriday/`: Contar "processados", "rejeitados" e "idPedido".
+        * `lp3/BEstacionamentos/`: Contar "carrosEntraram".
+        * `Lista Ex 6`: Perfeito para o `Sistema de Votação` (ex: `ConcurrentHashMap<String, AtomicInteger>` para contar votos por candidato).
+    * `AtomicBoolean`: Para flags de controle.
+        * `lp3/chat/`: A flag `running` no `ChatClient`.
+    * `AtomicReference`: Para atualizar um objeto inteiro.
+        * `Lista Ex 5`: Perfeito para o `Sistema de Leilão` (para guardar o "maior lance atual" e atualizá-lo atomicamente).
+
+**Use `synchronized` (Bloco ou Método)**
+* **Quando:** Você precisa proteger um *bloco de código* ou *método inteiro* que não pode ser executado por duas threads ao mesmo tempo. É a forma mais simples de "trancar a porta".
+* **O que é:** Um cadeado simples (mutex).
+* **Exemplos:**
+    * `lp3/Threads/MySynchronized.java`: O exemplo clássico para corrigir a condição de corrida do `i++`.
+    * `Lista Ex 7`: `Batalha Naval`. Você usaria `synchronized` em um método `fazerJogada(jogador, x, y)` para garantir que o "tabuleiro" compartilhado não seja modificado por ambos os jogadores ao mesmo tempo.
+
+**Use `Lock` (ReentrantLock) e `ReadWriteLock`**
+* **Quando:** Você precisa de um `synchronized` mais "inteligente" e flexível.
+* **Vantagem:** Permite `tryLock()` (tentar trancar sem bloquear) e é mais justo.
+* **Use `ReadWriteLock` (O mais importante):**
+    * **Quando:** Você tem um cenário de "Muitas Leituras, Poucas Escritas".
+    * **O que é:** Permite que *várias* threads leiam (`readLock`) ao mesmo tempo, mas bloqueia *todas* (leitoras e escritoras) quando *uma* thread precisa escrever (`writeLock`).
+    * **Exemplos:**
+        * `lp3/sistemaBlackFriday/`: Perfeito para o `GerenciadorEstoque` (muitos `consultarEstoque` [leitura], poucos `reservarEstoque` [escrita]).
+        * `Lista Ex 3`: Perfeito para o `Servidor de Dicionário`. Milhares de clientes podem *ler* (procurar palavras) ao mesmo tempo, mas um admin *escrevendo* (adicionando palavra) bloqueia tudo.
+
+---
+### PARTE 4: COORDENAÇÃO ENTRE THREADS (COMO SINCRONIZAR?)
+---
+
+**Use `volatile` (Variável Volátil)**
+* **Quando:** Você precisa *garantir a VISIBILIDADE* de uma variável entre threads. (Geralmente uma thread *escreve* e outras *leem*).
+* **O que é:** Uma regra que diz: "Não use cache de CPU para esta variável, leia sempre da memória principal".
+* **Exemplos:**
+    * `lp3/sistemaBlackFriday/Monitor.java`: A `volatile boolean isRunning` garante que a thread `Monitor` *veja* a mudança para `false` feita pela thread `main`.
+    * `lp3/Threads/Volatile.java`: Mostra o *problema* de não usar `volatile` (o loop `while(!preparado)` poderia nunca terminar).
+
+**Use Filas Sincronizadas (BlockingQueue)**
+* **Quando:** Você precisa implementar o padrão **Produtor-Consumidor**.
+* **O que é:** Uma fila thread-safe que bloqueia:
+    * O Produtor (com `put()`) se a fila estiver *cheia*.
+    * O Consumidor (com `take()`) se a fila estiver *vazia*.
+* **Exemplos:**
+    * `lp3/sistemaBlackFriday/`: É o coração do projeto. `Produtor` (gera pedido) -> `PriorityBlockingQueue` -> `Consumidor` (processa pedido).
+    * `Lista Ex 9`: É a definição exata deste problema.
+
+**Use `Semaphore` (Semáforo)**
+* **Quando:** Você precisa limitar o número de threads (N) que podem acessar um recurso.
+* **O que é:** Um "porteiro" com **N permissões**.
+* **Exemplos:**
+    * `lp3/BEstacionamentos/`: Perfeito. `new Semaphore(5)` para 5 vagas regulares. A 6ª thread (carro) fica `WAITING`.
+    * **Problema Novo:** Limitar o número de conexões ativas a um banco de dados ou o número de downloads simultâneos.
+
+**Use `CountDownLatch` (Barreira de Contagem)**
+* **Quando:** Você precisa que uma thread *espere* até que **N** outras tarefas terminem. É um evento de **uso único**.
+* **O que é:** Um "portão de largada".
+    1. A thread principal chama `latch.await()` e "dorme".
+    2. As N tarefas chamam `latch.countDown()` ao terminar.
+    3. Quando a contagem chega a 0, a thread principal "acorda".
+* **Exemplos:**
+    * `lp3/ApoloTech/`: O `ServerInitializer` *espera* (`await`) os 4 `ModuleLoader` terminarem (`countDown`).
+    * `Lista Ex 10`: A thread `main` poderia usar um `latch.await()` para esperar todas as threads de contagem de palavras terminarem antes de somar o resultado final.
+
+**Use `CyclicBarrier` (Barreira Cíclica) (Tópico 13)**
+* **Quando:** Você precisa que N threads *esperem umas pelas outras* em um "ponto de encontro" e *depois continuem*.
+* **O que é:** Uma barreira *reutilizável*. (Diferente do Latch, que é de uso único).
+* **Exemplos:**
+    * `Lista Ex 7`: `Batalha Naval`. Você precisa que a `Thread-Jogador1` e a `Thread-Jogador2` cheguem na barreira (`barrier.await()`) ao final de cada turno. Quando ambas chegarem, a barreira "quebra", ambas processam os resultados e iniciam o próximo turno (a barreira se auto-reseta).

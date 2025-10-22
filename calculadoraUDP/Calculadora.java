@@ -4,6 +4,9 @@ import java.sql.Struct;
 
 /**
  * Classe Calculadora para operações matemáticas básicas.
+ * Esta é uma classe "POJO" (Plain Old Java Object).
+ * Ela não tem conhecimento sobre redes ou threads.
+ * Sua única responsabilidade é conter os dados e a lógica do cálculo.
  */
 public final class Calculadora {
 
@@ -72,8 +75,12 @@ public final class Calculadora {
         return a * b;
     }
 
+    /**
+     * Executa o cálculo com base no 'byte' da operação
+     * e retorna o resultado como uma String.
+     */
     public String calcular(){
-        // Exemplo: 1 = soma, 2 = subtração, 3 = multiplicação, 4 = divisão
+        // O cliente envia a operação (ex: '+') como um byte.
         switch (this.operacao) {
             case '+':
                 return Float.toString(somar());

@@ -13,6 +13,15 @@ public class Monitor implements Runnable{
     private int tempoDecorrido = 0;
     private int processadosAnterior = 0;
 
+    // --- TÓPICO 9: MULTITHREAD - EM ESPERA (VOLATILE) ---
+    // Esta variável controla o loop 'while' no método 'run()'.
+    // Ela será acessada por duas threads:
+    // 1. A thread 'Monitor' (que lê)
+    // 2. A thread 'main' (que escreve 'false' no final)
+    //
+    // 'volatile' garante a VISIBILIDADE. Quando a thread 'main'
+    // mudar 'isRunning' para 'false', a thread 'Monitor'
+    // tem a garantia de que verá essa mudança e sairá do loop.
     volatile boolean isRunning = true;
 
     public Monitor(GerenciadorEstoque manager, PriorityBlockingQueue<Pedido> fila, AtomicInteger processados, AtomicInteger rejeitados, AtomicInteger qntPedidoGerado){
@@ -28,6 +37,14 @@ public class Monitor implements Runnable{
         while (this.isRunning) {
             try {
                 Thread.sleep(2000);
+
+                // --- TÓPICOS 7 e 8 (Leitura Segura) ---
+                // A thread 'Monitor' lê os dados enquanto
+                // Produtores e Consumidores estão escrevendo.
+                // Estas leituras são seguras pois:
+                // - fila.size() (Tópico 7) é thread-safe.
+                // - processados.get() (Tópico 8) é thread-safe.
+                
                 int processadosAtuais = processados.get();
                 int taxa = (processadosAtuais-processadosAnterior)/2;
                 processadosAnterior = processadosAtuais;

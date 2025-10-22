@@ -1,61 +1,97 @@
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicBoolean; // Importa a Classe Atômica
 
 public class ChatClient {
-    // Endereço do servidor (localhost)
     private static final String HOST = "127.0.0.1";
-    // Porta do servidor
     private static final int PORT = 12345;
 
     public static void main(String[] args) {
-        // Mensagem informando tentativa de conexão
         System.out.println("Conectando em " + HOST + ":" + PORT + "...");
         try (
-            // Cria o socket e conecta ao servidor
+            // Cria o socket (a "ligação telefônica" para o servidor)
             Socket socket = new Socket(HOST, PORT);
-            // Cria leitor para receber mensagens do servidor
+            // "Cano" para ler o que o SERVIDOR envia
             BufferedReader serverIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // Cria escritor para enviar mensagens ao servidor (auto-flush ativado)
+            // "Cano" para enviar coisas para o SERVIDOR
             PrintWriter serverOut = new PrintWriter(socket.getOutputStream(), true);
-            // Cria leitor para ler entrada do usuário (teclado)
+            // "Cano" para ler o que o USUÁRIO digita no teclado
             BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in))
         ) {
-            // Variável atômica para controlar se o cliente está rodando
+            // --- TÓPICO 8: CLASSES ATÔMICAS ---
+            // Esta variável 'running' será acessada por DUAS threads:
+            // 1. A thread 'main' (que lê o teclado)
+            // 2. A thread 'reader' (que lê do servidor)
+            //
+            // --- TÓPICO 9: VOLATILE ---
+            // Precisamos garantir "visibilidade". Quando a 'main'
+            // thread (ao ler "exit") mudar 'running' para 'false',
+            // a 'reader' thread TEM QUE VER essa mudança.
+            //
+            // Poderíamos usar 'private static volatile boolean running = true;'.
+            // 'AtomicBoolean' nos dá a mesma garantia de VISIBILIDADE
+            // que 'volatile' daria, com a vantagem de também
+            // fornecer operações atômicas (como 'compareAndSet').
             AtomicBoolean running = new AtomicBoolean(true);
 
-            // Thread para ler mensagens do servidor e imprimir na tela
+            // --- TÓPICO 1 (Conceituação) & TÓPICO 3 (Criação com Lambda) ---
+            // O cliente precisa de 2 threads para duas tarefas simultâneas:
+            // 1. A thread 'main' (abaixo) vai ler do teclado.
+            // 2. Esta nova thread, 'reader', vai ler do servidor.
+            //
+            // Se não tivéssemos esta thread, a 'main' ficaria "presa"
+            // em 'userIn.readLine()' e NUNCA veria as mensagens
+            // chegando do servidor.
+            //
+            // Esta é a forma moderna de criar uma thread (Tópico 3):
+            // () -> { ... } é uma "expressão lambda", uma forma
+            // concisa de implementar a interface 'Runnable' (Tópico 4).
             Thread reader = new Thread(() -> {
                 try {
                     String line;
-                    // Lê linhas do servidor enquanto houver dados
+                    // --- TÓPICO 2 (Ciclo de Vida) ---
+                    // A thread 'reader' bloqueia aqui (I/O wait)
+                    // esperando por mensagens do servidor.
                     while ((line = serverIn.readLine()) != null) {
-                        System.out.println(line); // Exibe mensagem recebida
+                        System.out.println(line); // Imprime a msg do servidor
                     }
                 } catch (IOException e) {
-                    // Se o servidor fechar a conexão, apenas encerra a thread
+                    // Acontece se o servidor cair ou o socket fechar.
                 } finally {
-                    running.set(false); // Marca que o cliente deve parar
+                    // Se o loop quebrar (servidor caiu),
+                    // avisa a 'main' thread para parar também.
+                    running.set(false);
                 }
             });
-            reader.start(); // Inicia a thread de leitura
+            reader.start(); // Inicia a thread 'reader' (NEW -> RUNNABLE)
 
-            // Loop principal: lê do teclado e envia ao servidor
+            // Loop principal (executado pela thread 'main')
             String userLine;
+            // O loop continua enquanto 'running' for true
+            // E o usuário estiver digitando
             while (running.get() && (userLine = userIn.readLine()) != null) {
-                // Envia a linha digitada pelo usuário ao servidor
-                // TODO [Aluno]: enviar a linha ao servidor
+                // Envia a linha do usuário para o servidor
                 serverOut.println(userLine);
-                // Se o usuário digitar "exit", encerra o loop
+                
+                // Se o usuário digitar "exit",
                 if ("exit".equalsIgnoreCase(userLine.trim())) {
+                    // --- TÓPICO 8 (Classes Atômicas) ---
+                    // A 'main' thread atualiza a flag atômica.
+                    // Devido à garantia de "visibilidade", a 'reader'
+                    // thread (que está em 'running.get()') verá
+                    // esta mudança e vai parar.
                     running.set(false);
                     break;
                 }
             }
-            // Aguarda a thread de leitura terminar (com timeout de 500ms)
+            
+            // --- TÓPICO 2 (Ciclo de Vida) ---
+            // A 'main' thread espera a 'reader' thread morrer.
+            // .join(500) faz a 'main' thread entrar em "TIMED_WAITING"
+            // por até 500ms, esperando a 'reader' terminar.
             try { reader.join(500); } catch (InterruptedException ignore) {}
+            
         } catch (IOException e) {
-            // Em caso de erro de I/O, imprime o stack trace
             e.printStackTrace();
         }
     }

@@ -1,0 +1,116 @@
+Este é um índice dos conceitos de Concorrência e Redes presentes nos seus projetos Java.
+
+---
+### Tópicos de Concorrência (Threads)
+---
+
+1. Conceitualização (Multithreading)
+   - `lp3/chat/ChatServer.java`: (Servidor multithreaded, 1 thread por cliente)
+   - `lp3/chat/ChatClient.java`: (Cliente multithreaded, 1 thread para ler do teclado, 1 para ler da rede)
+   - `lp3/sistemaBlackFriday/SistemaBlackFriday.java`: (Sistema multithreaded com padrão Produtor-Consumidor)
+
+2. Ciclo de Vida de Thread (Estados)
+   - `TIMED_WAITING` (Dormindo por tempo):
+     - `lp3/Threads/threads.java` (Thread.sleep)
+     - `lp3/ApoloTech/ModuleLoader.java` (Thread.sleep)
+     - `lp3/BEstacionamentos/Vehicle.java` (Thread.sleep - simula carro estacionado)
+     - `lp3/sistemaBlackFriday/Consumidor.java` (fila.poll com timeout)
+     - `lp3/sistemaBlackFriday/SistemaBlackFriday.java` (executor.awaitTermination)
+   - `WAITING` (Aguardando sinal):
+     - `lp3/ApoloTech/ServerInitializer.java` (latch.await)
+     - `lp3/BEstacionamentos/Vehicle.java` (semaphore.acquire - esperando por vaga/portão)
+     - `lp3/sistemaBlackFriday/Produtor.java` (fila.put - esperando fila esvaziar)
+   - `BLOCKED` (Aguardando lock):
+     - `lp3/Threads/MySynchronized.java` (Threads esperando pelo bloco `synchronized`)
+     - `lp3/sistemaBlackFriday/GerenciadorEstoque.java` (Threads esperando pelo `writeLock`)
+   - `RUNNABLE` -> `TERMINATED`:
+     - O fim de todo método `run()` (ex: `lp3/sistemaBlackFriday/Consumidor.java` ao sair do loop)
+
+3. Criação com Lambda
+   - `lp3/Threads/threads.java`: (Runnable lambdaRunnable = () -> { ... })
+   - `lp3/chat/ChatClient.java`: (new Thread(() -> { ... }) para a thread leitora)
+
+4. Criação com Runnable (implements Runnable)
+   - `lp3/Threads/myRunnable.java`
+   - `lp3/Threads/MySynchronized.java` (Classe interna myRunnable)
+   - `lp3/chat/ChatServer.java` (Classe interna ClientHandler)
+   - `lp3/ApoloTech/ModuleLoader.java`
+   - `lp3/ApoloTech/ServerInitializer.java`
+   - `lp3/BEstacionamentos/Vehicle.java`
+   - `lp3/sistemaBlackFriday/Produtor.java`
+   - `lp3/sistemaBlackFriday/Consumidor.java`
+   - `lp3/sistemaBlackFriday/Monitor.java`
+
+5. synchronized (Lock Mutex Clássico)
+   - `lp3/Threads/myRunnable.java`: (O *PROBLEMA* da Condição de Corrida que `synchronized` resolve)
+   - `lp3/Threads/MySynchronized.java`: (A *SOLUÇÃO*. Exemplo de `synchronized` em um bloco estático, usando o .class como lock)
+
+6. Sincronizar Coleções (Forma Antiga)
+   - (NENHUM)
+   - *Nota: Seus projetos usam a abordagem moderna (Tópico 7) em vez desta. A alternativa antiga seria `Collections.synchronizedList()`, que NÃO é usada.*
+
+7. Coleções para Concorrência (Forma Moderna)
+   - `PriorityBlockingQueue` (Fila Sincronizada de Produtor-Consumidor):
+     - `lp3/sistemaBlackFriday/SistemaBlackFriday.java` (criação da fila)
+     - `lp3/sistemaBlackFriday/Pedido.java` (implements Comparable para a fila de prioridade)
+     - `lp3/sistemaBlackFriday/Produtor.java` (fila.put)
+     - `lp3/sistemaBlackFriday/Consumidor.java` (fila.poll)
+   - `CopyOnWriteArrayList` (Lista otimizada para "muitas leituras, poucas escritas"):
+     - `lp3/chat/ChatServer.java` (Gerenciamento da lista de clientes para broadcast)
+   - `ConcurrentHashMap` (Mapa thread-safe):
+     - `lp3/sistemaBlackFriday/GerenciadorEstoque.java` (Armazenamento do estoque)
+
+8. Classes Atômicas
+   - `AtomicInteger` (Contador thread-safe):
+     - `lp3/BEstacionamentos/ParkingManager.java` (carrosDesistiram, carrosEntraram)
+     - `lp3/sistemaBlackFriday/Produtor.java` (static idPedido para IDs únicos)
+     - `lp3/sistemaBlackFriday/SistemaBlackFriday.java` (processados, rejeitados, etc.)
+   - `AtomicBoolean` (Flag thread-safe, com garantia de visibilidade):
+     - `lp3/chat/ChatClient.java` (Flag 'running' compartilhada entre a thread 'main' e 'reader')
+
+9. Multithread - Em Espera (Volatile)
+   - `lp3/Threads/Volatile.java`: (O *PROBLEMA* de visibilidade de memória que `volatile` resolve)
+   - `lp3/sistemaBlackFriday/Monitor.java`: (A *SOLUÇÃO*: `volatile boolean isRunning` para garantir que a thread 'main' possa parar o loop da thread 'Monitor')
+
+10. Executores (simples)
+   - `lp3/Threads/Executors_SingleThread_Callable.java`: (Executors.newSingleThreadExecutor)
+   - `lp3/sistemaBlackFriday/SistemaBlackFriday.java`: (newSingleThreadExecutor para o Monitor)
+
+11. Executores (múltiplas execuções)
+   - `lp3/ApoloTech/MainApp.java`: (Executors.newCachedThreadPool)
+   - `lp3/BEstacionamentos/ParkingSimulator.java`: (Executors.newFixedThreadPool)
+   - `lp3/sistemaBlackFriday/SistemaBlackFriday.java`: (newFixedThreadPool para Produtores e Consumidores)
+
+12. Executores (agendamento)
+   - (NENHUM)
+   - *Nota: Este conceito (ex: `Executors.newScheduledThreadPool()`) não foi usado nos seus projetos.*
+
+13. CyclicBarrier
+   - (NENHUM)
+   - *Nota: Este conceito (barreira reutilizável) não foi usado. Você usou `CountDownLatch` (Tópico 14) que é uma barreira de uso único.*
+
+14. CountDownLatch (Barreira de Contagem Regressiva)
+   - `lp3/ApoloTech/MainApp.java`: (Criação do `new CountDownLatch(4)`)
+   - `lp3/ApoloTech/ServerInitializer.java`: (Onde a thread 'servidor' espera: `latch.await()`)
+   - `lp3/ApoloTech/ModuleLoader.java`: (Onde as threads 'módulo' sinalizam: `latch.countDown()`)
+
+15. Semaphore (Semáforo)
+   - `lp3/BEstacionamentos/ParkingManager.java`: (Criação dos semáforos de vagas e portões: `new Semaphore(...)`)
+   - `lp3/BEstacionamentos/Vehicle.java`: (Uso: `acquire()` para pegar, `release()` para devolver, `tryAcquire()` para tentar sem bloquear)
+
+16. Lock (Alternativa moderna ao 'synchronized')
+   - `lp3/sistemaBlackFriday/GerenciadorEstoque.java`: (Exemplo de `ReentrantReadWriteLock`, `readLock.lock()` e `writeLock.lock()`)
+
+---
+### Tópicos de Rede (Sockets)
+---
+
+- Chamada Remota de Servidor (TCP - Confiável)
+  - `lp3/TCP/clientTCP.java` e `serverTCP.java` (Exemplo básico)
+  - `lp3/lista/ex1/EcoClient.java` e `EcoServer.java` (Exemplo de Eco)
+  - `lp3/lista/ex2/client.java` e `server.java` (Exemplo de Transferência de Arquivo)
+  - `lp3/chat/ChatClient.java` e `ChatServer.java` (Exemplo de Rede + Concorrência)
+
+- Chamada Remota de Servidor (UDP - Não confiável)
+  - `lp3/UDP/clientUDP.java` e `serverUDP.java` (Exemplo básico)
+  - `lp3/calculadoraUDP/clientUDP.java` e `serverCalc.java` (Exemplo da Calculadora)

@@ -3,6 +3,9 @@ package sistemaBlackFriday;
 import java.time.*;
 import java.time.format.*;
 
+// --- TÓPICO 7: COLEÇÕES PARA CONCORRÊNCIA (FILAS) ---
+// Para que a 'PriorityBlockingQueue' (a fila) saiba como
+// ordenar os pedidos, a classe Pedido DEVE implementar 'Comparable'.
 public class Pedido implements Comparable<Pedido>{
     public enum Prioridade{
         ALTA, MEDIA, BAIXA
@@ -24,14 +27,18 @@ public class Pedido implements Comparable<Pedido>{
         this.timestampCriacao = timestampCriacao;
     }
 
+    // Esta é a lógica de ordenação da Fila de Prioridade:
     @Override
     public int compareTo(Pedido outroPedido){
+        // 1. Compara pela Prioridade (ALTA vem primeiro)
         if (this.prioridade.ordinal() < outroPedido.prioridade.ordinal()){
-            return -1;
+            return -1; // 'this' é mais prioritário
         } else if (this.prioridade.ordinal() == outroPedido.prioridade.ordinal()){
+            // 2. Se a prioridade for igual, desempata pelo tempo (FIFO)
+            // O pedido mais ANTIGO (menor timestamp) vem primeiro.
             return Long.compare(this.timestampCriacao, outroPedido.timestampCriacao);
         } else {
-            return 1;
+            return 1; // 'this' é menos prioritário
         }
     }
 

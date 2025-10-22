@@ -13,18 +13,25 @@ import javax.swing.JOptionPane;
 public class clientTCP {
     public static void main(String[] args){
         try{
-            //o cliente é criado e tenta se conectar ao servidor no endereço e 
-            //na porta 12345
-            //se o servidor não estiver escutando, isso vai dar erro? R: sim!
+            // 1. O "telefonema" (Discar).
+            // Tenta se conectar ao servidor em "localhost" na porta 12345.
+            // Se o servidor não estiver rodando (em 'accept()'),
+            // isto dará um erro (Connection refused).
             Socket client = new Socket("localhost", 12345);
 
-            //criando um "cano de entrada" para receber dados do servidor
+            // 2. Cria um "cano de entrada" (ObjectInputStream)
+            // para RECEBER dados (objetos) DO SERVIDOR.
             ObjectInputStream entrada = new ObjectInputStream(client.getInputStream());
 
-            //vai ler o obj que o servidor enviou e armazena (ele já sabe exatamente o tipo de dado q vai receber)
+            // 3. Lê o objeto que o servidor enviou.
+            // A thread do cliente BLOQUEIA aqui e "espera"
+            // até que o servidor envie o objeto 'Date'.
             Date data_atual = (Date)entrada.readObject();
 
+            // 4. (Opcional) Exibe a data recebida em uma janela
             JOptionPane.showMessageDialog(null, "data de hj, recebida do servidor: " + data_atual.toString(), "TCP", 0);
+            
+            // 5. Fecha a conexão ("Desliga o telefone")
             entrada.close();
             System.out.println("conexão finished");
         }

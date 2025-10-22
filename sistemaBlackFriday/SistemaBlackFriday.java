@@ -11,20 +11,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SistemaBlackFriday {
     public static void main(String[] args) {
         long startTime = System.currentTimeMillis();
-        PriorityBlockingQueue<Pedido> fila = new PriorityBlockingQueue<>(50);
+
+        // --- TÓPICO 7: COLEÇÕES PARA CONCORRÊNCIA (FILAS) ---
+        // 1. Cria a fila (o "buffer" compartilhado).
+        // É uma Fila de Bloqueio (BlockingQueue)
+        // com Prioridade (Priority), baseada no Pedido.compareTo().
+        PriorityBlockingQueue<Pedido> fila = new PriorityBlockingQueue<>(50);        
+        
+        // 2. Cria o Recurso Crítico (com Locks)
         GerenciadorEstoque manager = new GerenciadorEstoque();
+
+        // --- TÓPICO 8: CLASSES ATÔMICAS ---
+        // 3. Cria os contadores compartilhados
         AtomicInteger processados = new AtomicInteger(0);
         AtomicInteger rejeitados = new AtomicInteger(0);
         AtomicInteger qntPedidoGerado = new AtomicInteger(0);
 
+// --- TÓPICOS 10 e 11: EXECUTORES ---
+        // 4. Cria os "Pools de Threads" (Exércitos de Trabalhadores)
+        
+        // Tópico 11 (Múltiplas): 3 threads para os Produtores
         ExecutorService produtores = Executors.newFixedThreadPool(3);
+        // Tópico 11 (Múltiplas): 5 threads para os Consumidores
         ExecutorService consumidores = Executors.newFixedThreadPool(5);
+        // Tópico 10 (Simples): 1 thread para o Monitor
         ExecutorService monitorExe = Executors.newSingleThreadExecutor();
 
+        // 5. Inicia o Monitor
         System.out.println("[Monitor] Iniciando monitoramento a cada 2 segundos");
         Monitor monitor = new Monitor(manager, fila, processados, rejeitados, qntPedidoGerado);
         monitorExe.execute(monitor);
 
+        // 6. Submete as tarefas Produtor (Tópico 4) ao pool (Tópico 11)
         for(int i = 0; i < 3; i++){
             String[] tipos = {"API", "Web", "Mobile"};
             String nome = tipos[i];
@@ -33,15 +51,21 @@ public class SistemaBlackFriday {
             produtores.execute(produtor);
         }
 
-        for(int i = 1; i <= 55; i++){
+        // 7. Submete as tarefas Consumidor (Tópico 4) ao pool (Tópico 11)
+        for(int i = 1; i <= 5; i++){
             String nomeConsumidor = "Consumidor-" + i;
             Consumidor consumidor = new Consumidor(nomeConsumidor, manager, fila, processados, rejeitados);
             consumidores.execute(consumidor);
         }
-        produtores.shutdown();
-        consumidores.shutdown();
+
+        // 8. Gerencia o desligamento (Tópico 2)
+        produtores.shutdown(); // Não aceita mais produtores
+        consumidores.shutdown(); // Não aceita mais consumidores
 
         try {
+            // A thread 'main' espera (TIMED_WAITING)
+            // os produtores terminarem.
+            
             // 1. Espera os produtores terminarem
             if (!produtores.awaitTermination(1, TimeUnit.MINUTES)) {
                 System.err.println("Produtores não terminaram, forçando desligamento.");

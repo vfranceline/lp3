@@ -1,0 +1,15 @@
+Tópico 1: Conceitualização (O que é uma Thread?)
+Pense em um Processo como seu aplicativo inteiro (ex: um jogo).
+Pense em uma Thread como um "trabalhador" dentro desse aplicativo. Um jogo (processo) pode ter várias threads: uma para desenhar gráficos (a "main thread"), uma para tocar música, outra para controlar a inteligência artificial dos inimigos.
+Concorrência é a habilidade de ter múltiplos "trabalhadores" (threads) executando tarefas aparentemente ao mesmo tempo. Em um computador com múltiplos núcleos de CPU, isso pode ser paralelismo real (tarefas diferentes em núcleos diferentes).
+Por que usar? Para responsividade (a interface não travar enquanto salva um arquivo) e desempenho (processar 1000 imagens em 8 threads é mais rápido que em 1).
+
+
+Tópico 2: Ciclo de Vida de uma Thread
+Uma thread não está sempre "rodando". Ela passa por vários estados:
+NEW (Nova): A thread foi criada (new Thread(r)), mas ainda não iniciada.
+RUNNABLE (Executável): A thread foi iniciada (t.start()). Ela está pronta para rodar e aguardando a JVM (Sistema Operacional) dar-lhe tempo de CPU.
+BLOCKED (Bloqueada): A thread está esperando para adquirir um lock (ex: entrar num bloco synchronized que já está ocupado).
+WAITING (Aguardando): A thread está pausada indefinidamente, esperando por um sinal de outra thread (ex: latch.await()). Ela não usa CPU.
+TIMED_WAITING (Aguardando com Tempo): Igual a WAITING, mas com um tempo limite (ex: Thread.sleep(1000)). Ela acorda sozinha após o tempo ou se for notificada.
+TERMINATED (Terminada): O método run() da thread foi concluído e a thread "morreu".
