@@ -1,4 +1,4 @@
-Este é um guia prático sobre "quando usar o quê" em concorrência e redes, baseado nos seus exercícios.
+Este é um guia prático sobre "quando usar o quê" em concorrência e redes, baseado nos exercícios.
 
 ---
 ### PARTE 1: A BASE (REDE)
