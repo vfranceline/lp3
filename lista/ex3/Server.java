@@ -14,13 +14,13 @@ public class Server {
     // Sendo 'static', ela será COMPARTILHADA por todas as threads de clientes.
     private static dicionario dic;
     
-    // Esta lista armazena o "cano de saída" de cada cliente.
-    // É uma lista "thread-safe" (CopyOnWriteArrayList), ideal para
-    // cenários com muitas leituras (como broadcast), que foi copiada
-    // do seu projeto de Chat.
-    // (Para este exercício de dicionário, ela não é estritamente necessária,
-    // já que um cliente não envia mensagens para os outros).
-    private static final List<PrintWriter> clients = new CopyOnWriteArrayList<>();
+    // // Esta lista armazena o "cano de saída" de cada cliente.
+    // // É uma lista "thread-safe" (CopyOnWriteArrayList), ideal para
+    // // cenários com muitas leituras (como broadcast), que foi copiada
+    // // do seu projeto de Chat.
+    // // (Para este exercício de dicionário, ela não é estritamente necessária,
+    // // já que um cliente não envia mensagens para os outros).
+    // private static final List<PrintWriter> clients = new CopyOnWriteArrayList<>();
 
     public static void main(String[] args) {
         dic = new dicionario();
@@ -83,8 +83,8 @@ public class Server {
                 // Inicializa o "cano" de saída (para enviar dados AO cliente)
                 out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
                 
-                // Adiciona o "cano" de saída deste cliente à lista thread-safe
-                clients.add(out);
+                // // Adiciona o "cano" de saída deste cliente à lista thread-safe
+                // clients.add(out);
 
                 // Envia a mensagem de boas-vindas para o cliente
                 out.println("Bem vindo ao dicionario TCP! \n Digite a palavra que você quer saber o significado ou digite 'exit' para sair.");
@@ -117,9 +117,9 @@ public class Server {
                 // Este bloco SEMPRE executa, quer o cliente saia com 'exit'
                 // ou feche a janela.
                 
-                if (out != null) {
-                    clients.remove(out); // Remove o cliente da lista
-                }
+                // if (out != null) {
+                //     clients.remove(out); // Remove o cliente da lista
+                // }
                 
                 try { 
                     socket.close(); // Fecha a conexão (o Socket) com este cliente.
