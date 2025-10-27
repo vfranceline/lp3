@@ -1,21 +1,15 @@
-package lista.ex5;
+package lista.ex6;
 
 import java.io.*;
 import java.net.*;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList; // Importa a coleção concorrente!
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
-// Classe principal do servidor de chat
-public class LeilaoServer {
-
+public class VotacaoServer {
     // Porta em que o servidor irá escutar conexões
     private static final int PORT = 12345;
 
-    private static ItemLeilao notebook = new ItemLeilao("notebook", 1000);
-
-    private static LogicaLeilao leilao = new LogicaLeilao(notebook);
+    private static LogicaVotacao votacao = new LogicaVotacao();
     private static final List<PrintWriter> clients = new CopyOnWriteArrayList<>();
 
     public static void main(String[] args) {
@@ -27,9 +21,6 @@ public class LeilaoServer {
         try (ServerSocket server = new ServerSocket(PORT)) {
             // Loop infinito da thread 'main' do servidor
             while (true) {
-                // --- TÓPICO 2: CICLO DE VIDA DE THREAD ---
-                // A thread 'main' bloqueia aqui, no estado RUNNABLE (mas
-                // "dormindo" em uma chamada de I/O) esperando uma conexão.
                 Socket cliente = server.accept(); // Aceita uma nova conexão de cliente
                 
                 System.out.println("[Server] Conexão de: " + cliente.getInetAddress().getHostAddress());
@@ -43,9 +34,6 @@ public class LeilaoServer {
         }
     }
 
-    // --- TÓPICO 4: CRIAÇÃO COM RUNNABLE ---
-    // Esta classe interna é a "tarefa" que cada thread de cliente
-    // irá executar. Ela implementa a interface 'Runnable'.
     private static class ClientHandler implements Runnable {
         private final Socket cliente;
         private PrintWriter out; // "Cano" de saída para ESTE cliente
@@ -69,17 +57,15 @@ public class LeilaoServer {
                 clients.add(out);
 
                 // 2) Envia mensagem de boas-vindas
-                out.println("Bem-vindo " + nome + "! Use 'exit' para sair.");
-                out.println(leilao.getStatusAtual());
-                broadcast("ATENÇÃO " + nome + " está participando do leilão", out);
+                out.println("Bem-vindo " + nome + "! Use 'exit' para sair ou 'RESULTADOS' para saber o estado atual da votação");
+                out.println(votacao.getOpcoes());
                 
-                String welcomeMSG = "[Server] " + nome + " está participando do leilão";
+                String welcomeMSG = "[Server] " + nome + " vai votar";
                 System.out.println(welcomeMSG);
-                broadcast(welcomeMSG, out);
 
                 // 3) Loop principal para ler mensagens DESTE cliente
 
-                out.println("Qual será seu primeiro lance? (digite apenas o valor)");
+                out.println("Para quem vai o seu voto?");
 
                 String line;
                 while ((line = in.readLine()) != null) {
@@ -88,22 +74,12 @@ public class LeilaoServer {
                         break; // Sai do loop
                     }
 
-                    try {
-                        double lance = Double.parseDouble(line);
+                    ResultadoVotacao resultadoVotacao = votacao.processarComando(line);
 
-                        ResultadoLance resultadoLance = new ResultadoLance(false, "");
-                        resultadoLance = leilao.fazerLance(lance, nome);
-                        
-                        if (resultadoLance.getEhNotificacaoPublica()){
-                            broadcast("[" + nome + "] " + resultadoLance.mensagem, out);
-                        }                        
-                        
-                        out.println(resultadoLance.mensagem);
-                        
-                    } catch (NumberFormatException e) {
-                        out.println("ERRO: Envie apenas numeros.");
-                    }
-
+                    if (resultadoVotacao.ehNotificacaoPublica){
+                        broadcast("[" + nome + "] " + resultadoVotacao.mensagem, out);
+                    } 
+                    out.println(resultadoVotacao.mensagem);
                     
                 }
             } catch (IOException e) {
