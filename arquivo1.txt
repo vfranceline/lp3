@@ -1,0 +1,2 @@
+Java é uma linguagem poderosa.
+Testando o contador de palavras.

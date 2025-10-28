@@ -1,0 +1,3 @@
+O CountDownLatch é muito útil.
+Este é o último arquivo de teste.
+Testando a soma final.

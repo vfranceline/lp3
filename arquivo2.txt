@@ -1,0 +1,2 @@
+Processamento paralelo com threads.
+Este arquivo é o segundo.
