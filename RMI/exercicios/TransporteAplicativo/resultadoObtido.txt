@@ -1,0 +1,334 @@
+vfran@vfran-ideapad-3:~/UNEB/semestre4/lp3/RMI/exercicios$ java -cp TransporteAplicativo TesteAutomatizado 
+
+═══════════════════════════════════════════════════════════
+   TESTE AUTOMATIZADO - SISTEMA DE DESPACHO DE CORRIDAS   
+═══════════════════════════════════════════════════════════
+
+
+═══════════════════════════════════════════════════════════
+ FASE 1: Inicializando Servidor
+═══════════════════════════════════════════════════════════
+[SUCESSO] RMI Registry criado na porta 1099
+[20:05:10] Servidor Despachante iniciado
+[SUCESSO] Servidor Despachante registrado
+[INFO] Servidor pronto para receber conexões
+
+═══════════════════════════════════════════════════════════
+ FASE 2: Registrando Motoristas
+═══════════════════════════════════════════════════════════
+[20:05:11] REGISTRO - Motorista=M001 Nome=João Silva Posicao=(-23.5505, -46.6333)
+[INFO] M001 - João Silva registrado em (-23.5505, -46.6333)
+[20:05:11] REGISTRO - Motorista=M002 Nome=Maria Santos Posicao=(-23.5600, -46.6500)
+[INFO] M002 - Maria Santos registrada em (-23.5600, -46.6500)
+[20:05:11] REGISTRO - Motorista=M003 Nome=Pedro Costa Posicao=(-23.5400, -46.6200)
+[INFO] M003 - Pedro Costa registrado em (-23.5400, -46.6200)
+[SUCESSO] 3 motoristas registrados e disponíveis
+
+═══════════════════════════════════════════════════════════
+ CENÁRIO 1: Matching Básico
+═══════════════════════════════════════════════════════════
+[INFO] Solicitando corrida STANDARD próxima ao centro
+[20:05:12] REQUISICAO - Corrida=253E8591 Passageiro=Ana Oliveira Prioridade=STANDARD Origem=(-23.5505, -46.6333) Destino=(-23.5600, -46.6400)
+[INFO] Bilhete gerado: 253E8591
+[20:05:12] [MATCHING] Corrida=253E8591 Motorista=M001 Distancia=0.0 Tentativa=1
+.[20:05:13] CONFIRMADA - Atribuicao=4BCD6DF4 Corrida=253E8591 Motorista=M001 Tempo=512ms
+.
+[SUCESSO] Corrida atribuída ao motorista: M001
+[INFO] Esperado: M001 (João) - mais próximo do centro
+[20:05:14] INICIADA - Corrida=253E8591 Motorista=M001
+[20:05:16] CONCLUÍDA - Corrida=253E8591 Motorista=M001
+
+═══════════════════════════════════════════════════════════
+ CENÁRIO 2: Prioridade VIP
+═══════════════════════════════════════════════════════════
+[INFO] Solicitando duas corridas: 1 STANDARD + 1 VIP
+[20:05:16] REQUISICAO - Corrida=1FDADC9E Passageiro=Carlos Lima Prioridade=STANDARD Origem=(-23.5510, -46.6340) Destino=(-23.5700, -46.6500)
+[INFO] STANDARD solicitada: 1FDADC9E
+[20:05:16] [MATCHING] Corrida=1FDADC9E Motorista=M001 Distancia=8.602325267051488E-4 Tentativa=1
+[20:05:16] REQUISICAO - Corrida=08CC272E Passageiro=Beatriz Souza Prioridade=VIP Origem=(-23.5405, -46.6205) Destino=(-23.5300, -46.6100)
+[INFO] VIP solicitada: 08CC272E
+[20:05:16] [MATCHING] Corrida=08CC272E Motorista=M003 Distancia=7.071067811899238E-4 Tentativa=1
+[20:05:17] CONFIRMADA - Atribuicao=6885088F Corrida=1FDADC9E Motorista=M001 Tempo=504ms
+[20:05:17] CONFIRMADA - Atribuicao=D6297E87 Corrida=08CC272E Motorista=M003 Tempo=503ms
+[20:05:18] INICIADA - Corrida=1FDADC9E Motorista=M001
+[20:05:18] INICIADA - Corrida=08CC272E Motorista=M003
+[SUCESSO] STANDARD atribuída a: M001
+[SUCESSO] VIP atribuída a: M003
+[INFO] Esperado: M003 (Pedro) - mais próximo da origem VIP
+[20:05:20] CONCLUÍDA - Corrida=1FDADC9E Motorista=M001
+[20:05:20] CONCLUÍDA - Corrida=08CC272E Motorista=M003
+
+═══════════════════════════════════════════════════════════
+ CENÁRIO 3: Concorrência (10 requisições simultâneas)
+═══════════════════════════════════════════════════════════
+[INFO] Enviando múltiplas requisições ao mesmo tempo
+[20:05:22] REQUISICAO - Corrida=74D281A5 Passageiro=Passageiro0 Prioridade=VIP Origem=(-23.5516, -46.6273) Destino=(-23.5630, -46.6450)
+[20:05:22] REQUISICAO - Corrida=8FBB851C Passageiro=Passageiro2 Prioridade=STANDARD Origem=(-23.5524, -46.6251) Destino=(-23.5622, -46.6369)
+[20:05:22] REQUISICAO - Corrida=8601B843 Passageiro=Passageiro3 Prioridade=VIP Origem=(-23.5472, -46.6321) Destino=(-23.5554, -46.6387)
+[20:05:22] REQUISICAO - Corrida=0820B8DC Passageiro=Passageiro1 Prioridade=STANDARD Origem=(-23.5540, -46.6324) Destino=(-23.5569, -46.6389)
+[20:05:22] REQUISICAO - Corrida=E97AD6E8 Passageiro=Passageiro4 Prioridade=STANDARD Origem=(-23.5523, -46.6344) Destino=(-23.5634, -46.6427)
+[20:05:22] [MATCHING] Corrida=74D281A5 Motorista=M001 Distancia=0.0061059278025447205 Tentativa=1
+[20:05:22] REQUISICAO - Corrida=DC7F5D70 Passageiro=Passageiro6 Prioridade=VIP Origem=(-23.5453, -46.6320) Destino=(-23.5581, -46.6389)
+[20:05:22] REQUISICAO - Corrida=C05E0EA3 Passageiro=Passageiro5 Prioridade=STANDARD Origem=(-23.5473, -46.6283) Destino=(-23.5638, -46.6399)
+[20:05:22] REQUISICAO - Corrida=CB436B51 Passageiro=Passageiro7 Prioridade=STANDARD Origem=(-23.5469, -46.6265) Destino=(-23.5563, -46.6350)
+[20:05:22] REQUISICAO - Corrida=5F6C9E3E Passageiro=Passageiro8 Prioridade=STANDARD Origem=(-23.5544, -46.6286) Destino=(-23.5649, -46.6421)
+[20:05:22] REQUISICAO - Corrida=3AAC58D2 Passageiro=Passageiro9 Prioridade=VIP Origem=(-23.5523, -46.6253) Destino=(-23.5559, -46.6372)
+[20:05:22] [MATCHING] Corrida=8FBB851C Motorista=M003 Distancia=0.013374402232905182 Tentativa=1
+[20:05:22] [MATCHING] Corrida=8601B843 Motorista=M002 Distancia=0.022028557899439145 Tentativa=1
+[INFO] 10 requisições enviadas em 5ms
+[20:05:22] Não foi possivel encontrar motorista
+[20:05:22] Não foi possivel encontrar motorista
+[20:05:22] Não foi possivel encontrar motorista
+[20:05:22] Não foi possivel encontrar motorista
+[20:05:22] Não foi possivel encontrar motorista
+[20:05:22] Não foi possivel encontrar motorista
+[20:05:22] Não foi possivel encontrar motorista
+[20:05:23] CONFIRMADA - Atribuicao=CE0EF1BF Corrida=74D281A5 Motorista=M001 Tempo=503ms
+[20:05:23] CONFIRMADA - Atribuicao=E5DF3FC8 Corrida=8FBB851C Motorista=M003 Tempo=506ms
+[20:05:23] CONFIRMADA - Atribuicao=A9CA089B Corrida=8601B843 Motorista=M002 Tempo=505ms
+[20:05:24] INICIADA - Corrida=8FBB851C Motorista=M003
+[20:05:24] INICIADA - Corrida=74D281A5 Motorista=M001
+[20:05:24] INICIADA - Corrida=8601B843 Motorista=M002
+[20:05:25] EXPIRADA - Corrida=CB436B51 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:25] EXPIRADA - Corrida=0820B8DC Motivo=TimeoutMatching Tempo=3002ms
+[20:05:25] EXPIRADA - Corrida=E97AD6E8 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:25] EXPIRADA - Corrida=DC7F5D70 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:25] EXPIRADA - Corrida=C05E0EA3 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:25] EXPIRADA - Corrida=5F6C9E3E Motivo=TimeoutMatching Tempo=3000ms
+[20:05:25] EXPIRADA - Corrida=3AAC58D2 Motivo=TimeoutMatching Tempo=3000ms
+[20:05:26] CONCLUÍDA - Corrida=74D281A5 Motorista=M001
+[20:05:26] CONCLUÍDA - Corrida=8FBB851C Motorista=M003
+[20:05:26] CONCLUÍDA - Corrida=8601B843 Motorista=M002
+[SUCESSO] Resultado: 3 atribuídas, 7 expiradas, 0 pendentes
+[INFO] Limitado a 3 motoristas disponíveis
+
+═══════════════════════════════════════════════════════════
+ CENÁRIO 4: Timeout de Confirmação
+═══════════════════════════════════════════════════════════
+[INFO] Desabilitando auto-confirmação de um motorista
+[INFO] Motorista M001 não confirmará corridas
+[20:05:31] REQUISICAO - Corrida=F0B62DAD Passageiro=Teste Timeout Prioridade=STANDARD Origem=(-23.5505, -46.6333) Destino=(-23.5600, -46.6400)
+[INFO] Corrida F0B62DAD solicitada
+[INFO] Aguardando timeout de confirmação (2s) e reatribuição...
+[20:05:31] [MATCHING] Corrida=F0B62DAD Motorista=M001 Distancia=0.0 Tentativa=1
+[20:05:33] [FALHA] Corrida=F0B62DAD Motorista=M001 Motivo=TimeoutConfirmacao Reatribuindo=true
+[20:05:33] [MATCHING] Corrida=F0B62DAD Motorista=M001 Distancia=0.0 Tentativa=1
+[20:05:34] EXPIRADA - Corrida=F0B62DAD Motivo=TimeoutMatching Tempo=3000ms
+[20:05:35] [FALHA] Corrida=F0B62DAD Motorista=M001 Motivo=TimeoutConfirmacao Reatribuindo=true
+[20:05:35] [MATCHING] Corrida=F0B62DAD Motorista=M001 Distancia=0.0 Tentativa=1
+[ALERTA] Status final: PENDENTE
+[20:05:37] [FALHA] Corrida=F0B62DAD Motorista=M001 Motivo=TimeoutConfirmacao Reatribuindo=true
+[20:05:37] [MATCHING] Corrida=F0B62DAD Motorista=M001 Distancia=0.0 Tentativa=1
+[20:05:38] CONFIRMADA - Atribuicao=B66F6934 Corrida=F0B62DAD Motorista=M001 Tempo=504ms
+[20:05:39] INICIADA - Corrida=F0B62DAD Motorista=M001
+[20:05:41] CONCLUÍDA - Corrida=F0B62DAD Motorista=M001
+
+═══════════════════════════════════════════════════════════
+ CENÁRIO 5: Cancelamento de Corrida
+═══════════════════════════════════════════════════════════
+[INFO] Solicitando corrida e cancelando antes da atribuição
+[20:05:41] REQUISICAO - Corrida=F80B7DED Passageiro=Teste Cancelamento Prioridade=STANDARD Origem=(-23.5505, -46.6333) Destino=(-23.5600, -46.6400)
+[INFO] Corrida F80B7DED solicitada
+[20:05:41] [MATCHING] Corrida=F80B7DED Motorista=M001 Distancia=0.0 Tentativa=1
+[20:05:41] CANCELADA - Corrida=F80B7DED
+[SUCESSO] Corrida cancelada com sucesso
+[SUCESSO] Status confirmado: CANCELADA
+[20:05:42] CONFIRMADA - Atribuicao=C68F1F03 Corrida=F80B7DED Motorista=M001 Tempo=502ms
+[20:05:43] INICIADA - Corrida=F80B7DED Motorista=M001
+
+═══════════════════════════════════════════════════════════
+ CENÁRIO 6: Timeout de Matching
+═══════════════════════════════════════════════════════════
+[INFO] Marcando todos motoristas como ocupados e solicitando corrida
+[20:05:44] STATUS ATUALIZADO - Motorista=M001 NovoStatus=OFFLINE
+[20:05:44] STATUS ATUALIZADO - Motorista=M002 NovoStatus=OFFLINE
+[20:05:44] STATUS ATUALIZADO - Motorista=M003 NovoStatus=OFFLINE
+[INFO] Todos os motoristas marcados como OFFLINE
+[20:05:44] REQUISICAO - Corrida=34CF677E Passageiro=Teste Timeout Prioridade=VIP Origem=(-23.5505, -46.6333) Destino=(-23.5600, -46.6400)
+[20:05:44] Não foi possivel encontrar motorista
+[INFO] Corrida 34CF677E solicitada
+[INFO] Aguardando timeout de matching (3s)...
+[20:05:45] CONCLUÍDA - Corrida=F80B7DED Motorista=M001
+[20:05:47] EXPIRADA - Corrida=34CF677E Motivo=TimeoutMatching Tempo=3000ms
+[SUCESSO] Corrida expirou corretamente após 3 segundos
+[20:05:48] STATUS ATUALIZADO - Motorista=M001 NovoStatus=DISPONIVEL
+[20:05:48] STATUS ATUALIZADO - Motorista=M002 NovoStatus=DISPONIVEL
+[20:05:48] STATUS ATUALIZADO - Motorista=M003 NovoStatus=DISPONIVEL
+[INFO] Motoristas reativados
+
+═══════════════════════════════════════════════════════════
+ CENÁRIO 7: Teste de Stress (50 requisições em 10s)
+═══════════════════════════════════════════════════════════
+[INFO] Enviando 50 requisições de passageiros com 3 motoristas
+[20:05:52] REQUISICAO - Corrida=8EBC5231 Passageiro=Passageiro0 Prioridade=VIP Origem=(-23.5527, -46.6276) Destino=(-23.5671, -46.6495)
+[20:05:52] REQUISICAO - Corrida=3CC63D12 Passageiro=Passageiro3 Prioridade=STANDARD Origem=(-23.5425, -46.6295) Destino=(-23.5686, -46.6474)
+[20:05:52] REQUISICAO - Corrida=72C0CAE9 Passageiro=Passageiro1 Prioridade=STANDARD Origem=(-23.5442, -46.6341) Destino=(-23.5691, -46.6409)
+[20:05:52] REQUISICAO - Corrida=5CB8BBFA Passageiro=Passageiro4 Prioridade=VIP Origem=(-23.5569, -46.6327) Destino=(-23.5554, -46.6471)
+[20:05:52] REQUISICAO - Corrida=D5C2CA28 Passageiro=Passageiro2 Prioridade=STANDARD Origem=(-23.5452, -46.6352) Destino=(-23.5661, -46.6360)
+[20:05:52] REQUISICAO - Corrida=AFA4E6EC Passageiro=Passageiro5 Prioridade=STANDARD Origem=(-23.5456, -46.6268) Destino=(-23.5637, -46.6334)
+[20:05:52] [MATCHING] Corrida=8EBC5231 Motorista=M001 Distancia=0.006125846526529299 Tentativa=1
+[20:05:52] REQUISICAO - Corrida=3D31C9DE Passageiro=Passageiro6 Prioridade=STANDARD Origem=(-23.5424, -46.6313) Destino=(-23.5595, -46.6340)
+[20:05:52] REQUISICAO - Corrida=BCEA466D Passageiro=Passageiro7 Prioridade=STANDARD Origem=(-23.5496, -46.6368) Destino=(-23.5520, -46.6466)
+[20:05:52] REQUISICAO - Corrida=4C0A253A Passageiro=Passageiro8 Prioridade=VIP Origem=(-23.5431, -46.6300) Destino=(-23.5602, -46.6460)
+[20:05:52] REQUISICAO - Corrida=DD1D3E95 Passageiro=Passageiro9 Prioridade=STANDARD Origem=(-23.5551, -46.6277) Destino=(-23.5520, -46.6325)
+[20:05:52] [MATCHING] Corrida=3CC63D12 Motorista=M003 Distancia=0.00979432129610359 Tentativa=1
+[20:05:52] [MATCHING] Corrida=72C0CAE9 Motorista=M002 Distancia=0.02239742446713112 Tentativa=1
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] REQUISICAO - Corrida=F01DDFA2 Passageiro=Passageiro10 Prioridade=STANDARD Origem=(-23.5502, -46.6322) Destino=(-23.5675, -46.6313)
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] REQUISICAO - Corrida=7155D0A5 Passageiro=Passageiro11 Prioridade=STANDARD Origem=(-23.5565, -46.6369) Destino=(-23.5505, -46.6476)
+[20:05:52] REQUISICAO - Corrida=49EEFD75 Passageiro=Passageiro12 Prioridade=VIP Origem=(-23.5480, -46.6355) Destino=(-23.5601, -46.6498)
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] REQUISICAO - Corrida=3169B3C1 Passageiro=Passageiro14 Prioridade=STANDARD Origem=(-23.5590, -46.6342) Destino=(-23.5679, -46.6320)
+[20:05:52] REQUISICAO - Corrida=19970A9F Passageiro=Passageiro13 Prioridade=STANDARD Origem=(-23.5528, -46.6338) Destino=(-23.5672, -46.6331)
+[20:05:52] REQUISICAO - Corrida=71523894 Passageiro=Passageiro15 Prioridade=STANDARD Origem=(-23.5472, -46.6389) Destino=(-23.5543, -46.6421)
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] REQUISICAO - Corrida=9115EC2E Passageiro=Passageiro16 Prioridade=VIP Origem=(-23.5513, -46.6382) Destino=(-23.5532, -46.6345)
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] REQUISICAO - Corrida=E5B2A4FA Passageiro=Passageiro17 Prioridade=STANDARD Origem=(-23.5502, -46.6347) Destino=(-23.5676, -46.6452)
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] REQUISICAO - Corrida=0A70CDDB Passageiro=Passageiro18 Prioridade=STANDARD Origem=(-23.5403, -46.6209) Destino=(-23.5644, -46.6372)
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] REQUISICAO - Corrida=6A74C4CF Passageiro=Passageiro19 Prioridade=STANDARD Origem=(-23.5586, -46.6243) Destino=(-23.5587, -46.6382)
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] REQUISICAO - Corrida=234851C9 Passageiro=Passageiro20 Prioridade=VIP Origem=(-23.5559, -46.6287) Destino=(-23.5674, -46.6404)
+[20:05:52] REQUISICAO - Corrida=39185EDC Passageiro=Passageiro21 Prioridade=STANDARD Origem=(-23.5547, -46.6230) Destino=(-23.5528, -46.6470)
+[20:05:52] REQUISICAO - Corrida=4E8A517E Passageiro=Passageiro22 Prioridade=STANDARD Origem=(-23.5553, -46.6367) Destino=(-23.5598, -46.6359)
+[20:05:52] REQUISICAO - Corrida=9185249F Passageiro=Passageiro23 Prioridade=STANDARD Origem=(-23.5489, -46.6283) Destino=(-23.5525, -46.6431)
+[20:05:52] REQUISICAO - Corrida=946AD8D0 Passageiro=Passageiro25 Prioridade=STANDARD Origem=(-23.5410, -46.6240) Destino=(-23.5621, -46.6352)
+[20:05:52] REQUISICAO - Corrida=57444096 Passageiro=Passageiro26 Prioridade=STANDARD Origem=(-23.5530, -46.6373) Destino=(-23.5669, -46.6500)
+[20:05:52] REQUISICAO - Corrida=36A415F5 Passageiro=Passageiro28 Prioridade=VIP Origem=(-23.5529, -46.6317) Destino=(-23.5508, -46.6492)
+[20:05:52] REQUISICAO - Corrida=4186422E Passageiro=Passageiro29 Prioridade=STANDARD Origem=(-23.5452, -46.6335) Destino=(-23.5624, -46.6428)
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] REQUISICAO - Corrida=96042A47 Passageiro=Passageiro24 Prioridade=VIP Origem=(-23.5434, -46.6318) Destino=(-23.5631, -46.6425)
+[20:05:52] REQUISICAO - Corrida=1B3F6100 Passageiro=Passageiro27 Prioridade=STANDARD Origem=(-23.5508, -46.6345) Destino=(-23.5626, -46.6390)
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] Não foi possivel encontrar motorista
+[20:05:52] CONFIRMADA - Atribuicao=3FA51EC3 Corrida=8EBC5231 Motorista=M001 Tempo=503ms
+[20:05:52] CONFIRMADA - Atribuicao=AB1A93E2 Corrida=3CC63D12 Motorista=M003 Tempo=502ms
+[20:05:52] CONFIRMADA - Atribuicao=C5FFFE38 Corrida=72C0CAE9 Motorista=M002 Tempo=502ms
+[20:05:53] REQUISICAO - Corrida=19172A99 Passageiro=Passageiro32 Prioridade=VIP Origem=(-23.5544, -46.6365) Destino=(-23.5696, -46.6416)
+[20:05:53] REQUISICAO - Corrida=C90FACF1 Passageiro=Passageiro33 Prioridade=STANDARD Origem=(-23.5503, -46.6343) Destino=(-23.5568, -46.6345)
+[20:05:53] REQUISICAO - Corrida=72A70DF9 Passageiro=Passageiro36 Prioridade=VIP Origem=(-23.5471, -46.6358) Destino=(-23.5607, -46.6432)
+[20:05:53] REQUISICAO - Corrida=DEF5865A Passageiro=Passageiro38 Prioridade=STANDARD Origem=(-23.5418, -46.6295) Destino=(-23.5644, -46.6415)
+[20:05:53] REQUISICAO - Corrida=F4E429EB Passageiro=Passageiro31 Prioridade=STANDARD Origem=(-23.5426, -46.6339) Destino=(-23.5632, -46.6400)
+[20:05:53] REQUISICAO - Corrida=5D019772 Passageiro=Passageiro34 Prioridade=STANDARD Origem=(-23.5494, -46.6227) Destino=(-23.5537, -46.6376)
+[20:05:53] REQUISICAO - Corrida=7E63E686 Passageiro=Passageiro30 Prioridade=STANDARD Origem=(-23.5486, -46.6253) Destino=(-23.5684, -46.6454)
+[20:05:53] REQUISICAO - Corrida=4A010F68 Passageiro=Passageiro35 Prioridade=STANDARD Origem=(-23.5463, -46.6368) Destino=(-23.5615, -46.6430)
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] REQUISICAO - Corrida=DA07F593 Passageiro=Passageiro37 Prioridade=STANDARD Origem=(-23.5531, -46.6223) Destino=(-23.5644, -46.6488)
+[20:05:53] REQUISICAO - Corrida=DDCBB72D Passageiro=Passageiro39 Prioridade=STANDARD Origem=(-23.5414, -46.6290) Destino=(-23.5685, -46.6400)
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] REQUISICAO - Corrida=CEAC7889 Passageiro=Passageiro41 Prioridade=STANDARD Origem=(-23.5438, -46.6295) Destino=(-23.5600, -46.6387)
+[20:05:53] REQUISICAO - Corrida=AE0EAEE5 Passageiro=Passageiro42 Prioridade=STANDARD Origem=(-23.5462, -46.6381) Destino=(-23.5581, -46.6373)
+[20:05:53] REQUISICAO - Corrida=F89CFD84 Passageiro=Passageiro45 Prioridade=STANDARD Origem=(-23.5465, -46.6376) Destino=(-23.5641, -46.6384)
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] REQUISICAO - Corrida=E5C43FDE Passageiro=Passageiro44 Prioridade=VIP Origem=(-23.5432, -46.6374) Destino=(-23.5595, -46.6422)
+[20:05:53] REQUISICAO - Corrida=AAB4817F Passageiro=Passageiro48 Prioridade=VIP Origem=(-23.5494, -46.6296) Destino=(-23.5543, -46.6384)
+[20:05:53] REQUISICAO - Corrida=4B88661F Passageiro=Passageiro46 Prioridade=STANDARD Origem=(-23.5522, -46.6343) Destino=(-23.5596, -46.6405)
+[20:05:53] REQUISICAO - Corrida=A7A11D72 Passageiro=Passageiro49 Prioridade=STANDARD Origem=(-23.5524, -46.6289) Destino=(-23.5545, -46.6492)
+[20:05:53] REQUISICAO - Corrida=43E1DBC1 Passageiro=Passageiro43 Prioridade=STANDARD Origem=(-23.5464, -46.6212) Destino=(-23.5654, -46.6429)
+[20:05:53] REQUISICAO - Corrida=F903378A Passageiro=Passageiro47 Prioridade=STANDARD Origem=(-23.5569, -46.6227) Destino=(-23.5552, -46.6313)
+[20:05:53] REQUISICAO - Corrida=1052EA25 Passageiro=Passageiro40 Prioridade=VIP Origem=(-23.5509, -46.6374) Destino=(-23.5625, -46.6485)
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[INFO] 50 requisições enviadas em 808ms
+[INFO] Aguardando processamento de todas as corridas...
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] Não foi possivel encontrar motorista
+[20:05:53] INICIADA - Corrida=8EBC5231 Motorista=M001
+[20:05:53] INICIADA - Corrida=3CC63D12 Motorista=M003
+[20:05:53] INICIADA - Corrida=72C0CAE9 Motorista=M002
+[20:05:55] EXPIRADA - Corrida=5CB8BBFA Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=3D31C9DE Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=D5C2CA28 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=AFA4E6EC Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=4C0A253A Motivo=TimeoutMatching Tempo=3000ms
+[20:05:55] EXPIRADA - Corrida=BCEA466D Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=DD1D3E95 Motivo=TimeoutMatching Tempo=3000ms
+[20:05:55] EXPIRADA - Corrida=F01DDFA2 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=7155D0A5 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=19970A9F Motivo=TimeoutMatching Tempo=3000ms
+[20:05:55] EXPIRADA - Corrida=3169B3C1 Motivo=TimeoutMatching Tempo=3000ms
+[20:05:55] EXPIRADA - Corrida=E5B2A4FA Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=49EEFD75 Motivo=TimeoutMatching Tempo=3000ms
+[20:05:55] EXPIRADA - Corrida=0A70CDDB Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=71523894 Motivo=TimeoutMatching Tempo=3000ms
+[20:05:55] EXPIRADA - Corrida=9115EC2E Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=6A74C4CF Motivo=TimeoutMatching Tempo=3000ms
+[20:05:55] EXPIRADA - Corrida=234851C9 Motivo=TimeoutMatching Tempo=3002ms
+[20:05:55] EXPIRADA - Corrida=4E8A517E Motivo=TimeoutMatching Tempo=3002ms
+[20:05:55] EXPIRADA - Corrida=9185249F Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=39185EDC Motivo=TimeoutMatching Tempo=3002ms
+[20:05:55] EXPIRADA - Corrida=36A415F5 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=946AD8D0 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=96042A47 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=1B3F6100 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=4186422E Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] EXPIRADA - Corrida=57444096 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:55] CONCLUÍDA - Corrida=8EBC5231 Motorista=M001
+[20:05:55] CONCLUÍDA - Corrida=3CC63D12 Motorista=M003
+[20:05:55] CONCLUÍDA - Corrida=72C0CAE9 Motorista=M002
+[20:05:56] EXPIRADA - Corrida=19172A99 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:56] EXPIRADA - Corrida=C90FACF1 Motivo=TimeoutMatching Tempo=3000ms
+[20:05:56] EXPIRADA - Corrida=72A70DF9 Motivo=TimeoutMatching Tempo=3000ms
+[20:05:56] EXPIRADA - Corrida=DEF5865A Motivo=TimeoutMatching Tempo=3000ms
+[20:05:56] EXPIRADA - Corrida=5D019772 Motivo=TimeoutMatching Tempo=3000ms
+[20:05:56] EXPIRADA - Corrida=F4E429EB Motivo=TimeoutMatching Tempo=3001ms
+[20:05:56] EXPIRADA - Corrida=7E63E686 Motivo=TimeoutMatching Tempo=3002ms
+[20:05:56] EXPIRADA - Corrida=4A010F68 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:56] EXPIRADA - Corrida=DDCBB72D Motivo=TimeoutMatching Tempo=3001ms
+[20:05:56] EXPIRADA - Corrida=DA07F593 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:56] EXPIRADA - Corrida=CEAC7889 Motivo=TimeoutMatching Tempo=3001ms
+[20:05:56] EXPIRADA - Corrida=AE0EAEE5 Motivo=TimeoutMatching Tempo=3002ms
+[20:05:56] EXPIRADA - Corrida=F89CFD84 Motivo=TimeoutMatching Tempo=3002ms
+[20:05:56] EXPIRADA - Corrida=4B88661F Motivo=TimeoutMatching Tempo=3002ms
+[20:05:56] EXPIRADA - Corrida=E5C43FDE Motivo=TimeoutMatching Tempo=3002ms
+[20:05:56] EXPIRADA - Corrida=AAB4817F Motivo=TimeoutMatching Tempo=3002ms
+[20:05:56] EXPIRADA - Corrida=A7A11D72 Motivo=TimeoutMatching Tempo=3002ms
+[20:05:56] EXPIRADA - Corrida=43E1DBC1 Motivo=TimeoutMatching Tempo=3002ms
+[20:05:56] EXPIRADA - Corrida=F903378A Motivo=TimeoutMatching Tempo=3002ms
+[20:05:56] EXPIRADA - Corrida=1052EA25 Motivo=TimeoutMatching Tempo=3002ms
+
+[SUCESSO] ═══ ESTATÍSTICAS DO TESTE DE STRESS ═══
+[INFO] Total de requisições: 50
+[INFO] Atribuídas: 3
+[INFO] Expiradas: 47
+[INFO] Pendentes: 0
+[INFO] Falhas: 0
+[INFO] Tempo total: 8810ms
+[INFO] Throughput: 0.34 corridas/segundo
+[ALERTA] Throughput abaixo do esperado (< 5 corridas/s)
+
+Pressione ENTER para finalizar o teste...
+
+
